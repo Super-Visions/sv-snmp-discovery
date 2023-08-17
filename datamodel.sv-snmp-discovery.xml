@@ -869,6 +869,7 @@
 				<entry id="Class:SnmpCredentials/Attribute:security_level/Value:authPriv" _delta="define_if_not_exists">AuthPriv</entry>
 				<entry id="Class:SnmpCredentials/Attribute:security_level/Value:noAuthNoPriv" _delta="define_if_not_exists">NoAuthNoPriv</entry>
 				<entry id="Class:SnmpCredentials/Attribute:security_name" _delta="define_if_not_exists">Security name</entry>
+				<entry id="Class:SnmpDiscovery" _delta="define">SNMP Discovery</entry>
 				<entry id="NetworkDevice:snmpdiscoveryinfo" _delta="define">SNMP Discovery Information</entry>
 				<entry id="SnmpCredentials:baseinfo" _delta="define_if_not_exists">General Information</entry>
 				<entry id="SnmpCredentials:v1-v2c" _delta="define_if_not_exists">SNMP V1 / V2c</entry>
