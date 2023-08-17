@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.1">
+	<classes>
+		<class id="SnmpCredentials" _delta="define">
+			<parent>cmdbAbstractObject</parent>
+			<properties>
+				<category>bizmodel,searchable</category>
+				<abstract>false</abstract>
+				<db_table>snmpcredentials</db_table>
+				<naming>
+					<attributes>
+						<attribute id="name"/>
+					</attributes>
+				</naming>
+				<reconsiliation>
+					<attributes>
+						<attribute id="org_id"/>
+						<attribute id="name"/>
+					</attributes>
+				</reconsiliation>
+				<style>
+					<icon>images/icons8-switch-48-lock.png</icon>
+				</style>
+			</properties>
+			<fields>
+				<field id="org_id" xsi:type="AttributeExternalKey">
+					<sql>org_id</sql>
+					<target_class>Organization</target_class>
+					<is_null_allowed>false</is_null_allowed>
+					<on_target_delete>DEL_MANUAL</on_target_delete>
+				</field>
+				<field id="description" xsi:type="AttributeText">
+					<sql>description</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="name" xsi:type="AttributeString">
+					<sql>name</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="community" xsi:type="AttributePassword">
+					<sql>community</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<dependencies>
+						<attribute id="security_level"/>
+					</dependencies>
+				</field>
+				<field id="device_list" xsi:type="AttributeLinkedSet">
+					<linked_class>NetworkDevice</linked_class>
+					<ext_key_to_me>snmpcredentials_id</ext_key_to_me>
+					<edit_mode>none</edit_mode>
+				</field>
+				<field id="security_level" xsi:type="AttributeEnum" _delta="define">
+					<sql>security_level</sql>
+					<values>
+						<value id="noAuthNoPriv">
+							<code>noAuthNoPriv</code>
+							<rank>1</rank>
+						</value>
+						<value id="authNoPriv">
+							<code>authNoPriv</code>
+							<rank>2</rank>
+						</value>
+						<value id="authPriv">
+							<code>authPriv</code>
+							<rank>3</rank>
+						</value>
+					</values>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<display_style>list</display_style>
+					<sort_type>rank</sort_type>
+				</field>
+				<field id="security_name" xsi:type="AttributeString">
+					<sql>security_name</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<dependencies>
+						<attribute id="security_level"/>
+					</dependencies>
+				</field>
+				<field id="auth_protocol" xsi:type="AttributeEnum" _delta="define">
+					<sql>auth_protocol</sql>
+					<values>
+						<value id="md5">
+							<code>md5</code>
+							<rank>1</rank>
+						</value>
+						<value id="sha">
+							<code>sha</code>
+							<rank>2</rank>
+						</value>
+					</values>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<display_style>list</display_style>
+					<sort_type>rank</sort_type>
+					<dependencies>
+						<attribute id="security_level"/>
+					</dependencies>
+				</field>
+				<field id="auth_passphrase" xsi:type="AttributePassword">
+					<sql>auth_passphrase</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<dependencies>
+						<attribute id="security_level"/>
+						<attribute id="auth_protocol"/>
+					</dependencies>
+				</field>
+				<field id="priv_protocol" xsi:type="AttributeEnum" _delta="define">
+					<sql>priv_protocol</sql>
+					<values>
+						<value id="des">
+							<code>des</code>
+							<rank>1</rank>
+						</value>
+						<value id="aes">
+							<code>aes</code>
+							<rank>2</rank>
+						</value>
+					</values>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<display_style>list</display_style>
+					<sort_type>rank</sort_type>
+					<dependencies>
+						<attribute id="security_level"/>
+					</dependencies>
+				</field>
+				<field id="priv_passphrase" xsi:type="AttributePassword">
+					<sql>priv_passphrase</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<dependencies>
+						<attribute id="security_level"/>
+						<attribute id="priv_protocol"/>
+					</dependencies>
+				</field>
+				<field id="context_name" xsi:type="AttributeString">
+					<sql>context_name</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<dependencies>
+						<attribute id="security_level"/>
+					</dependencies>
+				</field>
+			</fields>
+			<methods>
+				<method id="IsAttributeRelevantForSecurityLevel">
+					<static>true</static>
+					<access>public</access>
+					<type>Custom</type>
+					<code><![CDATA[	public static function IsAttributeRelevantForSecurityLevel(string $sAttCode, ?string $sSecLevel)
+	{
+		switch ($sAttCode) {
+			case 'community':
+				return empty($sSecLevel);
+			case 'security_name':
+			case 'context_name':
+				return !empty($sSecLevel);
+			case 'auth_passphrase':
+			case 'auth_protocol':
+				return $sSecLevel == 'authPriv' || $sSecLevel == 'authNoPriv';
+			case 'priv_passphrase':
+			case 'priv_protocol':
+				return $sSecLevel == 'authPriv';
+			default:
+				return false;
+		}
+	}]]></code>
+				</method>
+				<method id="GetInitialStateAttributeFlags">
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[ public function GetInitialStateAttributeFlags($sAttCode, &$aReasons = array())
+	{
+		$iFlags = 0;
+		switch ($sAttCode) {
+			case 'priv_passphrase':
+				if (empty($this->Get('priv_protocol'))) $iFlags |= OPT_ATT_READONLY;
+			case 'auth_passphrase':
+				if (empty($this->Get('auth_protocol'))) $iFlags |= OPT_ATT_READONLY;
+			case 'auth_protocol':
+			case 'priv_protocol':
+			case 'security_name':
+			case 'context_name':
+			case 'community';
+				if (!static::IsAttributeRelevantForSecurityLevel($sAttCode, $this->Get('security_level'))) $iFlags |= OPT_ATT_READONLY;
+				break;
+		}
+
+		return $iFlags | parent::GetInitialStateAttributeFlags($sAttCode, $aReasons);
+    }]]></code>
+				</method>
+				<method id="GetAttributeFlags">
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[ public function GetAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '')
+	{
+		$iFlags = 0;
+		switch ($sAttCode) {
+			case 'priv_passphrase':
+				if (empty($this->Get('priv_protocol'))) $iFlags |= OPT_ATT_READONLY;
+			case 'auth_passphrase':
+				if (empty($this->Get('auth_protocol'))) $iFlags |= OPT_ATT_READONLY;
+			case 'auth_protocol':
+			case 'priv_protocol':
+			case 'security_name':
+			case 'context_name':
+			case 'community';
+				if (!static::IsAttributeRelevantForSecurityLevel($sAttCode, $this->Get('security_level'))) $iFlags |= OPT_ATT_READONLY;
+				break;
+		}
+
+		return $iFlags | parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
+    }]]></code>
+				</method>
+				<method id="ComputeValues">
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[ public function ComputeValues()
+	{
+		parent::ComputeValues();
+
+		foreach ([
+			'community',
+			'security_name',
+			'auth_passphrase',
+			'auth_protocol',
+			'priv_passphrase',
+			'priv_protocol',
+			'context_name',
+		] as $sAttCode){
+			if (!static::IsAttributeRelevantForSecurityLevel($sAttCode, $this->Get('security_level'))) $this->Set($sAttCode, null);
+		}
+    }]]></code>
+				</method>
+			</methods>
+			<presentation>
+				<details>
+					<items>
+						<item id="col:col1">
+							<rank>10</rank>
+							<items>
+								<item id="fieldset:SnmpCredentials:baseinfo">
+									<rank>10</rank>
+									<items>
+										<item id="name">
+											<rank>10</rank>
+										</item>
+										<item id="org_id">
+											<rank>20</rank>
+										</item>
+										<item id="description">
+											<rank>30</rank>
+										</item>
+									</items>
+								</item>
+								<item id="fieldset:SnmpCredentials:v1-v2c">
+									<rank>20</rank>
+									<items>
+										<item id="community">
+											<rank>10</rank>
+										</item>
+									</items>
+								</item>
+							</items>
+						</item>
+						<item id="col:col2">
+							<rank>20</rank>
+							<items>
+								<item id="fieldset:SnmpCredentials:v3">
+									<rank>10</rank>
+									<items>
+										<item id="security_level">
+											<rank>10</rank>
+										</item>
+										<item id="security_name">
+											<rank>20</rank>
+										</item>
+										<item id="auth_protocol">
+											<rank>30</rank>
+										</item>
+										<item id="auth_passphrase">
+											<rank>40</rank>
+										</item>
+										<item id="priv_protocol">
+											<rank>50</rank>
+										</item>
+										<item id="priv_passphrase">
+											<rank>60</rank>
+										</item>
+										<item id="context_name">
+											<rank>70</rank>
+										</item>
+									</items>
+								</item>
+							</items>
+						</item>
+						<item id="device_list">
+							<rank>30</rank>
+						</item>
+					</items>
+				</details>
+				<search>
+					<items>
+						<item id="name">
+							<rank>10</rank>
+						</item>
+						<item id="org_id">
+							<rank>20</rank>
+						</item>
+					</items>
+				</search>
+				<list>
+					<items>
+						<item id="org_id">
+							<rank>10</rank>
+						</item>
+					</items>
+				</list>
+				<summary>
+					<items>
+						<item id="description">
+							<rank>10</rank>
+						</item>
+					</items>
+				</summary>
+			</presentation>
+		</class>
+		<class id="NetworkDevice" _created_in="itop-config-mgmt" _delta="must_exist">
+			<fields>
+				<field id="snmpcredentials_id" xsi:type="AttributeExternalKey" _delta="define_if_not_exists">
+					<sql>snmpcredentials_id</sql>
+					<target_class>SnmpCredentials</target_class>
+					<is_null_allowed>true</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="snmp_last_discovery" xsi:type="AttributeDateTime" _delta="define">
+					<sql>snmp_last_discovery</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<tracking_level>none</tracking_level>
+				</field>
+				<field id="responds_to_snmp" xsi:type="AttributeEnum" _delta="define">
+					<sql>responds_to_snmp</sql>
+					<values>
+						<value id="yes">
+							<code>yes</code>
+						</value>
+						<value id="no">
+							<code>no</code>
+						</value>
+						<value id="na">
+							<code>na</code>
+						</value>
+					</values>
+					<default_value>na</default_value>
+					<is_null_allowed>false</is_null_allowed>
+					<display_style>list</display_style>
+					<dependencies/>
+				</field>
+				<field id="snmp_sysName" xsi:type="AttributeString" _delta="define">
+					<sql>snmp_sysname</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="snmp_sysDescr" xsi:type="AttributeText" _delta="define">
+					<sql>snmp_sysdescr</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="snmp_sysLocation" xsi:type="AttributeString" _delta="define">
+					<sql>snmp_syslocation</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="snmp_sysContact" xsi:type="AttributeString" _delta="define">
+					<sql>snmp_sysContact</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="snmp_serial_oid" xsi:type="AttributeString" _delta="define">
+					<sql>snmp_serial_oid</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<tracking_level>none</tracking_level>
+				</field>
+			</fields>
+			<methods>
+				<method id="GetInitialStateAttributeFlags" _delta="define">
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[ public function GetInitialStateAttributeFlags($sAttCode, &$aReasons = array())
+	{
+		$iFlags = 0;
+		switch ($sAttCode) {
+			case 'responds_to_snmp':
+			case 'snmp_last_discovery':
+			case 'snmp_sysName':
+			case 'snmp_sysDescr':
+			case 'snmp_sysContact':
+			case 'snmp_sysLocation':
+				$iFlags |= OPT_ATT_READONLY;
+				break;
+		}
+
+		return $iFlags | parent::GetInitialStateAttributeFlags($sAttCode, $aReasons);
+    }]]></code>
+				</method>
+				<method id="GetAttributeFlags" _delta="define">
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[	function GetAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '')
+	{
+		$iFlags = 0;
+		switch ($sAttCode) {
+			case 'responds_to_snmp':
+			case 'snmp_last_discovery':
+			case 'snmp_sysName':
+			case 'snmp_sysDescr':
+			case 'snmp_sysContact':
+			case 'snmp_sysLocation':
+				$iFlags |= OPT_ATT_READONLY;
+				break;
+		}
+
+		return $iFlags | parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
+	}]]></code>
+				</method>
+			</methods>
+			<presentation>
+				<details>
+					<items>
+						<item id="col:col1">
+							<items>
+								<item id="fieldset:Server:moreinfo" _delta="if_exists">
+									<items>
+										<item id="snmpcredentials_id" _delta="delete_if_exists"/>
+									</items>
+								</item>
+							</items>
+						</item>
+						<item id="col:col3">
+							<items>
+								<item id="fieldset:NetworkDevice:snmpdiscoveryinfo" _delta="define">
+									<rank>10</rank>
+									<items>
+										<item id="snmpcredentials_id">
+											<rank>10</rank>
+										</item>
+										<item id="snmp_last_discovery">
+											<rank>20</rank>
+										</item>
+										<item id="responds_to_snmp">
+											<rank>30</rank>
+										</item>
+										<item id="snmp_sysName">
+											<rank>40</rank>
+										</item>
+										<item id="snmp_sysDescr">
+											<rank>50</rank>
+										</item>
+										<item id="snmp_sysContact">
+											<rank>60</rank>
+										</item>
+										<item id="snmp_sysLocation">
+											<rank>70</rank>
+										</item>
+									</items>
+								</item>
+							</items>
+						</item>
+					</items>
+				</details>
+			</presentation>
+		</class>
+		<class id="SNMPDiscovery" _delta="define">
+			<parent>IPApplication</parent>
+			<properties>
+				<category>bizmodel,searchable</category>
+				<abstract>false</abstract>
+				<db_table>snmpdiscovery</db_table>
+				<naming>
+					<attributes>
+						<attribute id="name"/>
+					</attributes>
+				</naming>
+				<reconciliation>
+					<attributes>
+						<attribute id="name"/>
+						<attribute id="org_id"/>
+					</attributes>
+				</reconciliation>
+				<style>
+					<icon>images/icons8-switch-48-search.png</icon>
+				</style>
+			</properties>
+			<fields>
+				<field id="dhcp_range_discovery_enabled" xsi:type="AttributeEnum">
+					<sql>dhcp_range_discovery_enabled</sql>
+					<values>
+						<value id="yes">
+							<code>yes</code>
+						</value>
+						<value id="no">
+							<code>no</code>
+						</value>
+					</values>
+					<default_value>yes</default_value>
+					<is_null_allowed>false</is_null_allowed>
+					<display_style>radio_horizontal</display_style>
+					<dependencies/>
+				</field>
+				<field id="ipv4subnets_list" xsi:type="AttributeLinkedSet">
+					<linked_class>IPv4Subnet</linked_class>
+					<ext_key_to_me>snmpdiscovery_id</ext_key_to_me>
+					<tracking_level/>
+					<edit_mode>add_remove</edit_mode>
+				</field>
+			</fields>
+			<methods/>
+			<presentation>
+				<list>
+					<items>
+						<item id="uuid">
+							<rank>10</rank>
+						</item>
+						<item id="org_id">
+							<rank>20</rank>
+						</item>
+						<item id="status">
+							<rank>30</rank>
+						</item>
+						<item id="location_id">
+							<rank>40</rank>
+						</item>
+					</items>
+				</list>
+				<search>
+					<items>
+						<item id="name">
+							<rank>10</rank>
+						</item>
+						<item id="org_id">
+							<rank>20</rank>
+						</item>
+						<item id="status">
+							<rank>30</rank>
+						</item>
+						<item id="business_criticity">
+							<rank>40</rank>
+						</item>
+						<item id="location_id">
+							<rank>50</rank>
+						</item>
+						<item id="move2production">
+							<rank>60</rank>
+						</item>
+						<item id="uuid">
+							<rank>70</rank>
+						</item>
+					</items>
+				</search>
+				<default_search>
+					<items>
+						<item id="name">
+							<rank>10</rank>
+						</item>
+						<item id="org_id">
+							<rank>20</rank>
+						</item>
+						<item id="status">
+							<rank>30</rank>
+						</item>
+						<item id="uuid">
+							<rank>70</rank>
+						</item>
+					</items>
+				</default_search>
+				<details>
+					<items>
+						<item id="col:col1">
+							<items>
+								<item id="fieldset:Class:IPDiscovery:baseinfo">
+									<items>
+										<item id="name">
+											<rank>10</rank>
+										</item>
+										<item id="org_id">
+											<rank>20</rank>
+										</item>
+										<item id="status">
+											<rank>30</rank>
+										</item>
+										<item id="business_criticity">
+											<rank>40</rank>
+										</item>
+										<item id="location_id">
+											<rank>50</rank>
+										</item>
+										<item id="description">
+											<rank>60</rank>
+										</item>
+										<item id="move2production">
+											<rank>70</rank>
+										</item>
+										<item id="uuid">
+											<rank>80</rank>
+										</item>
+									</items>
+									<rank>10</rank>
+								</item>
+								<item id="fieldset:Class:IPDiscovery:operation">
+									<items>
+										<item id="dhcp_range_discovery_enabled">
+											<rank>10</rank>
+										</item>
+									</items>
+								</item>
+							</items>
+							<rank>10</rank>
+						</item>
+						<item id="contacts_list">
+							<rank>30</rank>
+						</item>
+						<item id="documents_list">
+							<rank>40</rank>
+						</item>
+						<item id="ipv4subnets_list">
+							<rank>50</rank>
+						</item>
+					</items>
+				</details>
+			</presentation>
+		</class>
+		<class id="lnkSnmpCredentialsToIPSubnet" _delta="define">
+			<parent>cmdbAbstractObject</parent>
+			<properties>
+				<is_link>1</is_link>
+				<category>bizmodel</category>
+				<abstract>false</abstract>
+				<db_table>lnksnmpcredentialstoipsubnet</db_table>
+				<naming>
+					<attributes>
+						<attribute id="ipsubnet_name"/>
+						<attribute id="snmpcredentials_name"/>
+					</attributes>
+				</naming>
+				<order>
+					<columns>
+						<column id="ipsubnet_name" ascending="true"/>
+						<column id="rank" ascending="true"/>
+					</columns>
+				</order>
+				<reconciliation>
+					<attributes>
+						<attribute id="snmpcredentials_id"/>
+						<attribute id="ipsubnet_id"/>
+					</attributes>
+				</reconciliation>
+				<uniqueness_rules>
+					<rule id="no_duplicate">
+						<attributes>
+							<attribute id="snmpcredentials_id"/>
+							<attribute id="ipsubnet_id"/>
+						</attributes>
+						<is_blocking>true</is_blocking>
+					</rule>
+				</uniqueness_rules>
+			</properties>
+			<fields>
+				<field id="ipsubnet_id" xsi:type="AttributeExternalKey">
+					<sql>ipsubnet_id</sql>
+					<target_class>IPSubnet</target_class>
+					<is_null_allowed>false</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="ipsubnet_name" xsi:type="AttributeExternalField">
+					<extkey_attcode>ipsubnet_id</extkey_attcode>
+					<target_attcode>name</target_attcode>
+				</field>
+				<field id="rank" xsi:type="AttributeInteger">
+					<sql>rank</sql>
+					<default_value/>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="snmpcredentials_id" xsi:type="AttributeExternalKey">
+					<sql>snmpcredentials_id</sql>
+					<target_class>SnmpCredentials</target_class>
+					<is_null_allowed>false</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="snmpcredentials_name" xsi:type="AttributeExternalField">
+					<extkey_attcode>snmpcredentials_id</extkey_attcode>
+					<target_attcode>name</target_attcode>
+				</field>
+			</fields>
+			<methods/>
+			<presentation>
+				<details>
+					<items>
+						<item id="ipsubnet_id">
+							<rank>10</rank>
+						</item>
+						<item id="snmpcredentials_id">
+							<rank>20</rank>
+						</item>
+						<item id="rank">
+							<rank>30</rank>
+						</item>
+					</items>
+				</details>
+				<search>
+					<items>
+						<item id="ipsubnet_id">
+							<rank>10</rank>
+						</item>
+						<item id="snmpcredentials_id">
+							<rank>20</rank>
+						</item>
+					</items>
+				</search>
+				<default_search>
+					<items>
+						<item id="ipsubnet_id">
+							<rank>10</rank>
+						</item>
+						<item id="snmpcredentials_id">
+							<rank>20</rank>
+						</item>
+					</items>
+				</default_search>
+				<list>
+					<items>
+						<item id="rank">
+							<rank>30</rank>
+						</item>
+						<item id="snmpcredentials_id">
+							<rank>20</rank>
+						</item>
+						<item id="ipsubnet_id">
+							<rank>10</rank>
+						</item>
+					</items>
+				</list>
+			</presentation>
+		</class>
+		<class id="IPSubnet" _created_in="teemip-ip-mgmt" _delta="must_exist">
+			<fields>
+				<field id="snmpcredentials_list" xsi:type="AttributeLinkedSetIndirect" _delta="define">
+					<linked_class>lnkSnmpCredentialsToIPSubnet</linked_class>
+					<ext_key_to_me>ipsubnet_id</ext_key_to_me>
+					<ext_key_to_remote>snmpcredentials_id</ext_key_to_remote>
+					<duplicates/>
+				</field>
+				<field id="snmpdiscovery_id" xsi:type="AttributeExternalKey" _delta="define">
+					<sql>snmpdiscovery_id</sql>
+					<target_class>SNMPDiscovery</target_class>
+					<is_null_allowed>true</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="default_networkdevicetype_id" xsi:type="AttributeExternalKey" _delta="define">
+					<sql>default_networkdevicetype_id</sql>
+					<target_class>NetworkDeviceType</target_class>
+					<is_null_allowed>true</is_null_allowed>
+					<on_target_delete>DEL_MANUAL</on_target_delete>
+				</field>
+			</fields>
+		</class>
+		<class id="IPv4Subnet" _created_in="teemip-ip-mgmt" _delta="must_exist">
+			<presentation>
+				<details>
+					<items>
+						<item id="col:col3">
+							<items>
+								<item id="fieldset:Class:IPSubnet:discoveryapp" _delta="must_exist">
+									<items>
+										<item id="snmpdiscovery_id" _delta="define">
+											<rank>70</rank>
+										</item>
+									</items>
+								</item>
+								<item id="fieldset:Class:IPSubnet:discoverysubnet" _delta="must_exist">
+									<items>
+										<item id="default_networkdevicetype_id" _delta="define">
+											<rank>70</rank>
+										</item>
+									</items>
+								</item>
+							</items>
+						</item>
+						<item id="snmpcredentials_list" _delta="define">
+							<rank>100</rank>
+						</item>
+					</items>
+				</details>
+			</presentation>
+		</class>
+	</classes>
+	<menus>
+		<menu id="ConfigManagement:TeemIpNetworking" _delta="must_exist">
+			<definition>
+				<cells>
+					<cell id="teemip_connectivity" _delta="must_exist">
+						<dashlets>
+							<dashlet id="teemip-snmp_credentials" xsi:type="DashletBadge" _delta="define_if_not_exists">
+								<rank>50</rank>
+								<class>SnmpCredentials</class>
+							</dashlet>
+						</dashlets>
+					</cell>
+				</cells>
+			</definition>
+		</menu>
+	</menus>
+	<user_rights>
+		<groups/>
+		<profiles/>
+	</user_rights>
+	<dictionaries>
+		<dictionary id="EN US">
+			<entries>
+				<entry id="Class:IPSubnet/Attribute:default_networkdevicetype_id" _delta="define">Default network type</entry>
+				<entry id="Class:IPSubnet/Attribute:default_networkdevicetype_id+" _delta="define">Network type to use when the discovery finds a new device with SNMP.</entry>
+				<entry id="Class:IPSubnet/Attribute:snmpcredentials_list" _delta="define">SNMP Credentials</entry>
+				<entry id="Class:IPSubnet/Attribute:snmpdiscovery_id" _delta="define">SNMP discovery application</entry>
+				<entry id="Class:lnkSnmpCredentialsToIPSubnet" _delta="define">Link SNMP Credentials / Subnet</entry>
+				<entry id="Class:lnkSnmpCredentialsToIPSubnet/Attribute:ipsubnet_id" _delta="define">Subnet</entry>
+				<entry id="Class:lnkSnmpCredentialsToIPSubnet/Attribute:rank" _delta="define">Rank</entry>
+				<entry id="Class:lnkSnmpCredentialsToIPSubnet/Attribute:snmpcredentials_id" _delta="define">SNMP credentials</entry>
+				<entry id="Class:NetworkDevice/Attribute:responds_to_snmp" _delta="define">Responds to SNMP</entry>
+				<entry id="Class:NetworkDevice/Attribute:responds_to_snmp/Value:na" _delta="define">N/A</entry>
+				<entry id="Class:NetworkDevice/Attribute:responds_to_snmp/Value:no" _delta="define">No</entry>
+				<entry id="Class:NetworkDevice/Attribute:responds_to_snmp/Value:yes" _delta="define">Yes</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmp_last_discovery" _delta="define">Last discovery date</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmp_last_discovery+" _delta="define">Date when the SNMP device has been discovered last</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmp_sysContact" _delta="define">sysContact</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmp_sysDescr" _delta="define">sysDescr</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmp_sysLocation" _delta="define">sysLocation</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmp_sysName" _delta="define">sysName</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmpcredentials_id" _delta="define_if_not_exists">SNMP Credentials</entry>
+				<entry id="Class:SnmpCredentials" _delta="define_if_not_exists">SNMP Credentials</entry>
+				<entry id="Class:SnmpCredentials/Attribute:auth_passphrase" _delta="define_if_not_exists">Authentication passphrase</entry>
+				<entry id="Class:SnmpCredentials/Attribute:auth_protocol" _delta="define_if_not_exists">Authentication protocol</entry>
+				<entry id="Class:SnmpCredentials/Attribute:auth_protocol/Value:md5" _delta="define_if_not_exists">MD5</entry>
+				<entry id="Class:SnmpCredentials/Attribute:auth_protocol/Value:sha" _delta="define_if_not_exists">SHA</entry>
+				<entry id="Class:SnmpCredentials/Attribute:community" _delta="define_if_not_exists">Community</entry>
+				<entry id="Class:SnmpCredentials/Attribute:context_name" _delta="define_if_not_exists">Context name</entry>
+				<entry id="Class:SnmpCredentials/Attribute:description" _delta="define_if_not_exists">Description</entry>
+				<entry id="Class:SnmpCredentials/Attribute:device_list" _delta="define_if_not_exists">Devices</entry>
+				<entry id="Class:SnmpCredentials/Attribute:device_list+" _delta="define_if_not_exists">Devices using these credentials.</entry>
+				<entry id="Class:SnmpCredentials/Attribute:name" _delta="define_if_not_exists">Name</entry>
+				<entry id="Class:SnmpCredentials/Attribute:org_id" _delta="define_if_not_exists">Organization</entry>
+				<entry id="Class:SnmpCredentials/Attribute:priv_passphrase" _delta="define_if_not_exists">Privacy passphrase</entry>
+				<entry id="Class:SnmpCredentials/Attribute:priv_protocol" _delta="define_if_not_exists">Privacy protocol</entry>
+				<entry id="Class:SnmpCredentials/Attribute:priv_protocol/Value:aes" _delta="define_if_not_exists">AES</entry>
+				<entry id="Class:SnmpCredentials/Attribute:priv_protocol/Value:des" _delta="define_if_not_exists">DES</entry>
+				<entry id="Class:SnmpCredentials/Attribute:security_level" _delta="define_if_not_exists">Security level</entry>
+				<entry id="Class:SnmpCredentials/Attribute:security_level/Value:authNoPriv" _delta="define_if_not_exists">AuthNoPriv</entry>
+				<entry id="Class:SnmpCredentials/Attribute:security_level/Value:authPriv" _delta="define_if_not_exists">AuthPriv</entry>
+				<entry id="Class:SnmpCredentials/Attribute:security_level/Value:noAuthNoPriv" _delta="define_if_not_exists">NoAuthNoPriv</entry>
+				<entry id="Class:SnmpCredentials/Attribute:security_name" _delta="define_if_not_exists">Security name</entry>
+				<entry id="NetworkDevice:snmpdiscoveryinfo" _delta="define">SNMP Discovery Information</entry>
+				<entry id="SnmpCredentials:baseinfo" _delta="define_if_not_exists">General Information</entry>
+				<entry id="SnmpCredentials:v1-v2c" _delta="define_if_not_exists">SNMP V1 / V2c</entry>
+				<entry id="SnmpCredentials:v3" _delta="define_if_not_exists">SNMP V3</entry>
+			</entries>
+		</dictionary>
+	</dictionaries>
+</itop_design>
