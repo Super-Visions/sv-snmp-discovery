@@ -493,6 +493,9 @@
 					<attributes>
 						<attribute id="name"/>
 					</attributes>
+					<complementary_attributes>
+						<attribute id="uuid"/>
+					</complementary_attributes>
 				</naming>
 				<reconciliation>
 					<attributes>
@@ -505,23 +508,14 @@
 				</style>
 			</properties>
 			<fields>
-				<field id="dhcp_range_discovery_enabled" xsi:type="AttributeEnum">
-					<sql>dhcp_range_discovery_enabled</sql>
-					<values>
-						<value id="yes">
-							<code>yes</code>
-						</value>
-						<value id="no">
-							<code>no</code>
-						</value>
-					</values>
-					<default_value>yes</default_value>
-					<is_null_allowed>false</is_null_allowed>
-					<display_style>radio_horizontal</display_style>
-					<dependencies/>
-				</field>
 				<field id="ipv4subnets_list" xsi:type="AttributeLinkedSet">
 					<linked_class>IPv4Subnet</linked_class>
+					<ext_key_to_me>snmpdiscovery_id</ext_key_to_me>
+					<tracking_level/>
+					<edit_mode>add_remove</edit_mode>
+				</field>
+				<field id="ipv6subnets_list" xsi:type="AttributeLinkedSet">
+					<linked_class>IPv6Subnet</linked_class>
 					<ext_key_to_me>snmpdiscovery_id</ext_key_to_me>
 					<tracking_level/>
 					<edit_mode>add_remove</edit_mode>
@@ -619,13 +613,6 @@
 									</items>
 									<rank>10</rank>
 								</item>
-								<item id="fieldset:Class:IPDiscovery:operation">
-									<items>
-										<item id="dhcp_range_discovery_enabled">
-											<rank>10</rank>
-										</item>
-									</items>
-								</item>
 							</items>
 							<rank>10</rank>
 						</item>
@@ -637,6 +624,9 @@
 						</item>
 						<item id="ipv4subnets_list">
 							<rank>50</rank>
+						</item>
+						<item id="ipv6subnets_list">
+							<rank>60</rank>
 						</item>
 					</items>
 				</details>
@@ -869,7 +859,11 @@
 				<entry id="Class:SnmpCredentials/Attribute:security_level/Value:authPriv" _delta="define_if_not_exists">AuthPriv</entry>
 				<entry id="Class:SnmpCredentials/Attribute:security_level/Value:noAuthNoPriv" _delta="define_if_not_exists">NoAuthNoPriv</entry>
 				<entry id="Class:SnmpCredentials/Attribute:security_name" _delta="define_if_not_exists">Security name</entry>
-				<entry id="Class:SnmpDiscovery" _delta="define">SNMP Discovery</entry>
+				<entry id="Class:SNMPDiscovery" _delta="define">SNMP Discovery</entry>
+				<entry id="Class:SNMPDiscovery/Attribute:ipv4subnets_list" _delta="define">IPv4 Subnets</entry>
+				<entry id="Class:SNMPDiscovery/Attribute:ipv4subnets_list+" _delta="define">Subnets configured to be discovered by this application.</entry>
+				<entry id="Class:SNMPDiscovery/Attribute:ipv6subnets_list" _delta="define">IPv6 Subnets</entry>
+				<entry id="Class:SNMPDiscovery/Attribute:ipv6subnets_list+" _delta="define">Subnets configured to be discovered by this application.</entry>
 				<entry id="NetworkDevice:snmpdiscoveryinfo" _delta="define">SNMP Discovery Information</entry>
 				<entry id="SnmpCredentials:baseinfo" _delta="define_if_not_exists">General Information</entry>
 				<entry id="SnmpCredentials:v1-v2c" _delta="define_if_not_exists">SNMP V1 / V2c</entry>
