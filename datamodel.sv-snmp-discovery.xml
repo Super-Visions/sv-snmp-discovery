@@ -801,6 +801,14 @@
 				</details>
 			</presentation>
 		</class>
+		<class id="IPv6Address" _created_in="teemip-ipv6-mgmt" _delta="must_exist">
+			<fields>
+				<field id="subnet_ip" xsi:type="AttributeExternalField" _delta="define_if_not_exists">
+					<extkey_attcode>subnet_id</extkey_attcode>
+					<target_attcode>ip</target_attcode>
+				</field>
+			</fields>
+		</class>
 	</classes>
 	<menus>
 		<menu id="ConfigManagement:TeemIpNetworking" _delta="must_exist">
