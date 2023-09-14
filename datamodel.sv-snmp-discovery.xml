@@ -52,7 +52,7 @@
 					<ext_key_to_me>snmpcredentials_id</ext_key_to_me>
 					<edit_mode>none</edit_mode>
 				</field>
-				<field id="security_level" xsi:type="AttributeEnum" _delta="define">
+				<field id="security_level" xsi:type="AttributeEnum">
 					<sql>security_level</sql>
 					<values>
 						<value id="noAuthNoPriv">
@@ -81,7 +81,7 @@
 						<attribute id="security_level"/>
 					</dependencies>
 				</field>
-				<field id="auth_protocol" xsi:type="AttributeEnum" _delta="define">
+				<field id="auth_protocol" xsi:type="AttributeEnum">
 					<sql>auth_protocol</sql>
 					<values>
 						<value id="md5">
@@ -110,7 +110,7 @@
 						<attribute id="auth_protocol"/>
 					</dependencies>
 				</field>
-				<field id="priv_protocol" xsi:type="AttributeEnum" _delta="define">
+				<field id="priv_protocol" xsi:type="AttributeEnum">
 					<sql>priv_protocol</sql>
 					<values>
 						<value id="des">
