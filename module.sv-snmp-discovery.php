@@ -16,8 +16,7 @@ SetupWebPage::AddModule(
 		// Setup
 		//
 		'dependencies' => array(
-            'itop-config-mgmt/3.1.0',
-			'teemip-network-mgmt/3.1.0',
+			'teemip-network-mgmt-extended/3.1.1',
             'teemip-ip-discovery/3.1.0',
 		),
 		'mandatory' => false,
