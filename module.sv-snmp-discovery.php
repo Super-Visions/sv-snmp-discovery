@@ -16,8 +16,9 @@ SetupWebPage::AddModule(
 		// Setup
 		//
 		'dependencies' => array(
-			'teemip-network-mgmt-extended/=3.1.0',
+			'teemip-network-mgmt-extended/3.1.1',
             'teemip-ip-discovery/3.1.0',
+			'teemip-ipv6-mgmt/3.1.1',
 		),
 		'mandatory' => false,
 		'visible' => true,
