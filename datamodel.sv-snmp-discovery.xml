@@ -451,7 +451,27 @@
 			</presentation>
 		</class>
 	</classes>
-	<menus/>
+	<menus>
+		<menu id="IPDiscovery" _created_in="teemip-ip-discovery" _delta="if_exists">
+			<definition>
+				<cells>
+					<cell id="teemip-disc-300" _delta="if_exists">
+						<dashlets>
+							<dashlet id="teemip-disc-300-snmp" xsi:type="DashletHeaderDynamic" _delta="define">
+								<rank>4</rank>
+								<title>Menu:IPDiscovery:IPv4SNMP</title>
+								<icon>sv-snmp-discovery-main/images/icons8-switch-48-search.png</icon>
+								<subtitle>Menu:IPDiscovery:IPv4SNMP+</subtitle>
+								<query>SELECT IPv4Address AS A JOIN NetworkDevice AS D ON D.managementip_id = A.id WHERE D.responds_to_snmp = 'yes'</query>
+								<group_by>status</group_by>
+								<values>allocated,released,reserved,unassigned</values>
+							</dashlet>
+						</dashlets>
+					</cell>
+				</cells>
+			</definition>
+		</menu>
+	</menus>
 	<user_rights>
 		<groups/>
 		<profiles/>
@@ -483,6 +503,8 @@
 				<entry id="Class:SNMPDiscovery/Attribute:ipv6subnets_list" _delta="define">IPv6 Subnets</entry>
 				<entry id="Class:SNMPDiscovery/Attribute:ipv6subnets_list+" _delta="define">Subnets configured to be discovered by this application.</entry>
 				<entry id="NetworkDevice:snmpdiscoveryinfo" _delta="define">SNMP Discovery Information</entry>
+				<entry id="Menu:IPDiscovery:IPv4SNMP" _delta="define">IPv4 Addresses that answer to SNMP</entry>
+				<entry id="Menu:IPDiscovery:IPv4SNMP+" _delta="define">By status</entry>
 			</entries>
 		</dictionary>
 	</dictionaries>
