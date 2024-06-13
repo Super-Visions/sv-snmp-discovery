@@ -1,0 +1,32 @@
+name: Module packaging
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout module
+        uses: actions/checkout@v4
+      - name: Create package
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          filename: ${{ github.workspace }}-${{ github.ref_name }}.zip
+          path: '*'
+          directory: '..'
+          exclusions: '*.git*'
+      - name: Create draft release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: ${{ github.workspace }}-${{ github.ref_name }}.zip
+          artifactErrorsFailBuild: true
+          draft: true
+          generateReleaseNotes: true
+          omitNameDuringUpdate: true
+          omitBodyDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          updateOnlyUnreleased: true
+          token: ${{ secrets.ACCESS_TOKEN }}

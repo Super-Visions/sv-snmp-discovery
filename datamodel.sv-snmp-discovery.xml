@@ -460,7 +460,7 @@
 							<dashlet id="teemip-disc-300-snmp" xsi:type="DashletHeaderDynamic" _delta="define">
 								<rank>4</rank>
 								<title>Menu:IPDiscovery:IPv4SNMP</title>
-								<icon>sv-snmp-discovery-main/images/icons8-switch-48-search.png</icon>
+								<icon>sv-snmp-discovery/images/icons8-switch-48-search.png</icon>
 								<subtitle>Menu:IPDiscovery:IPv4SNMP+</subtitle>
 								<query>SELECT IPv4Address AS A JOIN NetworkDevice AS D ON D.managementip_id = A.id WHERE D.responds_to_snmp = 'yes'</query>
 								<group_by>status</group_by>
