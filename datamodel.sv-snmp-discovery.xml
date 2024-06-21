@@ -47,6 +47,12 @@
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
+				<field id="snmp_sysUptime" xsi:type="AttributeDuration" _delta="define">
+					<sql>snmp_sysuptime</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+					<tracking_level>none</tracking_level>
+				</field>
 			</fields>
 			<methods>
 				<method id="GetInitialStateAttributeFlags" _delta="define">
@@ -63,6 +69,7 @@
 			case 'snmp_sysDescr':
 			case 'snmp_sysContact':
 			case 'snmp_sysLocation':
+			case 'snmp_sysUptime':
 				$iFlags |= OPT_ATT_READONLY;
 				break;
 		}
@@ -84,6 +91,7 @@
 			case 'snmp_sysDescr':
 			case 'snmp_sysContact':
 			case 'snmp_sysLocation':
+			case 'snmp_sysUptime':
 				$iFlags |= OPT_ATT_READONLY;
 				break;
 		}
@@ -121,14 +129,17 @@
 										<item id="snmp_sysName">
 											<rank>40</rank>
 										</item>
-										<item id="snmp_sysDescr">
+										<item id="snmp_sysUptime">
 											<rank>50</rank>
 										</item>
-										<item id="snmp_sysContact">
+										<item id="snmp_sysDescr">
 											<rank>60</rank>
 										</item>
-										<item id="snmp_sysLocation">
+										<item id="snmp_sysContact">
 											<rank>70</rank>
+										</item>
+										<item id="snmp_sysLocation">
+											<rank>80</rank>
 										</item>
 									</items>
 								</item>
@@ -497,6 +508,7 @@
 				<entry id="Class:NetworkDevice/Attribute:snmp_sysDescr" _delta="define">sysDescr</entry>
 				<entry id="Class:NetworkDevice/Attribute:snmp_sysLocation" _delta="define">sysLocation</entry>
 				<entry id="Class:NetworkDevice/Attribute:snmp_sysName" _delta="define">sysName</entry>
+				<entry id="Class:NetworkDevice/Attribute:snmp_sysUptime" _delta="define">sysUptime</entry>
 				<entry id="Class:SNMPDiscovery" _delta="define">SNMP Discovery</entry>
 				<entry id="Class:SNMPDiscovery/Attribute:ipv4subnets_list" _delta="define">IPv4 Subnets</entry>
 				<entry id="Class:SNMPDiscovery/Attribute:ipv4subnets_list+" _delta="define">Subnets configured to be discovered by this application.</entry>
